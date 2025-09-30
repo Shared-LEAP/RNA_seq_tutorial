@@ -7,7 +7,24 @@ Status: In-progress
 Summary: The following are steps to obtain, process, and analyze RNAseq data for differential gene expression analysis. 
 
 **Note:
-Make sure to change directories to relative paths in your system.**
+Make sure to change directories to relative paths in your system. Make appropriate folder for project**
+
+_________________________________________________________________________________________________________________________________________________________
+
+Option 1:
+
+Run on cluster (personnal computer not sufficient) 
+
+        - conda_setup_script.sh 
+                This will set up the required environment in your project folder
+        
+        - rna_expression_pipeline.sh 
+                This will run each step mentioned below for proprocess RNA raw reads, alignment, quantification, and differienatial analysis
+
+Option 2:
+Follow the steps below as a tutorial.
+
+_________________________________________________________________________________________________________________________________________________________
 
 Installation Requirements
 1. gzip
