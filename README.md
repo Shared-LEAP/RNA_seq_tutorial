@@ -1,9 +1,13 @@
 # RNA-seq Data Analysis Start to Finish
 
 Tool: RNA-seq Analysis
+
 Author: Josue Navarrete
+
 Date: 09/25/2025
+
 Status: In-progress
+
 Summary: The following are steps to obtain, process, and analyze RNAseq data for differential gene expression analysis. 
 
 **Note:
