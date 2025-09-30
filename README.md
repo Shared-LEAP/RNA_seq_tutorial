@@ -13,13 +13,26 @@ ________________________________________________________________________________
 
 Option 1:
 
-Run on cluster (personnal computer not sufficient) 
+Run on cluster (personal computer not sufficient) 
 
-        - conda_setup_script.sh 
+        1. conda_setup_script.sh 
                 This will set up the required environment in your project folder
+
+                Use the following in terminal:
+                    sbatch conda_setup_script.sh
+
+                Verify queue:
+                    squeue
         
-        - rna_expression_pipeline.sh 
-                This will run each step mentioned below for proprocess RNA raw reads, alignment, quantification, and differienatial analysis
+        2. rna_expression_pipeline.sh 
+                This will run each step mentioned below for proprocess RNA raw reads, alignment, quantification, and differential analysis
+
+                Use the following in terminal:
+                    sbatch rna_expression_pipeline.sh
+
+                Verify queue:
+                    squeue
+
 
 Option 2:
 Follow the steps below as a tutorial.
