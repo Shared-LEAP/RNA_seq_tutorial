@@ -19,14 +19,31 @@ Option 1:
 
 Run on cluster (personal computer not sufficient) 
 
-        1. conda_setup_script.sh 
-                This will set up the required environment in your project folder
+        1. Setup Conda Environments
+                Required Conda Environments:
+                gzip
+                fastqc
+                trimmomatic
+                rsem
+                deseq2
 
-                Use the following in terminal:
-                    sbatch conda_setup_script.sh
-
-                Verify queue:
-                    squeue
+                How to Create Conda Environments:
+                conda create -n <library name> <library name> -y 
+                
+                Ex:
+                conda create -n gzip gzip -y
+                
+                conda create: This is the main command to create a new Conda environment. 
+                
+                -n gzip: The -n flag stands for "name". This specifies the name of the new environment, 
+                which will be called gzip. Conda environments are isolated spaces that allow you to manage 
+                different sets of packages and dependencies for different projects.
+                
+                gzip: This second instance of gzip is the package you want to install into the newly created 
+                environment. This will install the gzip compression utility in the gzip environment.
+                
+                -y: The -y flag, or --yes, automatically answers "yes" to any prompts that Conda would 
+                otherwise present, such as "Proceed ([y]/n)?". 
         
         2. rna_expression_pipeline.sh 
                 This will run each step mentioned below for proprocess RNA raw reads, alignment, quantification, and differential analysis
@@ -52,40 +69,38 @@ Installation Requirements
 
 
 Create conda environments 
-```   
-        conda create -n <library name> <library name>
-        
-        ex: 
-            
-            conda create -n fastqc fastqc
+``` 
+# gzip environment
+conda create -n gzip gzip -y
+
+# fastqc environment
+conda create -n fastqc fastqc -y
+
+# trimmomatic environment
+conda create -n trimmomatic trimmomatic -y
+
+# rsem environment (using conda-forge as priority to avoid conflicts)
+conda create -n rsem -c conda-forge -c bioconda rsem star -y
 ```
-Sample/Data: grab the paired fastq files 
 
-
-ENCFF489WGO.fastq.gz
-ENCFF522FSF.fastq.gz
-
-From:
-
+Biosample Summary - Homo sapiens K562 genetically modified (deletion) using CRISPR targeting H. sapiens RNASEH2A
+From: 
 https://www.encodeproject.org/experiments/ENCSR002JOW/#:~:text=Isogenic%20replicateLibrary-,Accession,-File%20typeRun
 <br/>
 
-Biosample Summary - Homo sapiens K562 genetically modified (deletion) using CRISPR targeting H. sapiens RNASEH2A
+**Sample/Data: grab the paired fastq files from link above**
+        
+        ENCFF489WGO.fastq.gz
+        ENCFF522FSF.fastq.gz
 
 
-
-
-Code:
-RNA data files:
-ENCFF489WGO.fastq.gz
-ENCFF522FSF.fastq.gz
 -----------------------------------------------------------------------------
 Step 1: Unzip gz 
     conda activate gzip
+    
+    gzip -dk <path to your folder>/Raw_reads/ENCFF489WGO.fastq.gz.download/ENCFF489WGO.fastq.gz
 
-    gzip -dk /Users/jnavarrete/Desktop/multi_omic-practice/rna_seq/Raw_reads/ENCFF489WGO.fastq.gz.download/ENCFF489WGO.fastq.gz
-
-    gzip -dk /Users/jnavarrete/Desktop/multi_omic-practice/rna_seq/Raw_reads/ENCFF522FSF.fastq.gz.download/ENCFF522FSF.fastq.gz 
+    gzip -dk <path to your folder>/Raw_reads/ENCFF522FSF.fastq.gz.download/ENCFF522FSF.fastq.gz 
 
     conda deactivate
 -----------------------------------------------------------------------------
@@ -100,8 +115,8 @@ Step 3: Trim Reads using trimmomatic
     conda activate trimmomatic
 
     trimmomatic PE \
-    /Users/jnavarrete/Desktop/multi_omic-practice/rna_seq/Raw_reads/ENCFF489WGO.fastq \
-    /Users/jnavarrete/Desktop/multi_omic-practice/rna_seq/Raw_reads/ENCFF522FSF.fastq \
+    <path to your folder>/Raw_reads/ENCFF489WGO.fastq \
+    <path to your folder>/Raw_reads/ENCFF522FSF.fastq \
     output_forward_paired.fastq output_forward_unpaired.fastq \
     output_reverse_paired.fastq output_reverse_unpaired.fastq \
     ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 \
