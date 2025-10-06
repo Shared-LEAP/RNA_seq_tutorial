@@ -15,7 +15,7 @@ Make sure to change directories to relative paths in your system. Make appropria
 
 _________________________________________________________________________________________________________________________________________________________
 
-Run on cluster (personal computer not sufficient) 
+Run on cluster (personal computer not sufficient, 6 samples took a full day to run) 
 
 _________________________________________________________________________________________________________________________________________________________
 
