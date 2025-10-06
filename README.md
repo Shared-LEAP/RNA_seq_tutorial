@@ -10,9 +10,13 @@ Status: Complete!
 
 Summary: The following are steps to obtain, process, and analyze RNAseq data for differential gene expression analysis. 
 
-**Note:
-Make sure to change directories to relative paths in your system. Make appropriate folder for project**
+**Note:**
 
+- **Make sure to change directories to relative paths in your system.**
+
+- **Make appropriate folder for project**
+
+- **The following is for mouse samples not human. The steps are the same.**
 _________________________________________________________________________________________________________________________________________________________
 
 Run on cluster (personal computer not sufficient, 6 samples took a full day to run) 
@@ -178,4 +182,9 @@ rsem output: transcript-level and a gene-level count estimate
         echo "Gene-level results: RSEM_results/gene_expression_matrix.txt"
         echo "Isoform-level results: RSEM_results/isoform_expression_matrix.txt"
 -----------------------------------------------------------------------------
+
+
+
+## Take result to R and conduct Differential Gene Expression using Deseq2
+Use Mouse_Gene_Deseq.R to make volcano, MA, GO plots
 
