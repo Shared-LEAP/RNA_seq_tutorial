@@ -15,48 +15,7 @@ Make sure to change directories to relative paths in your system. Make appropria
 
 _________________________________________________________________________________________________________________________________________________________
 
-Option 1:
-
 Run on cluster (personal computer not sufficient) 
-
-        1. Setup Conda Environments
-                Required Conda Environments:
-                gzip
-                fastqc
-                trimmomatic
-                rsem
-                deseq2
-
-                How to Create Conda Environments:
-                conda create -n <library name> <library name> -y 
-                
-                Ex:
-                conda create -n gzip gzip -y
-                
-                conda create: This is the main command to create a new Conda environment. 
-                
-                -n gzip: The -n flag stands for "name". This specifies the name of the new environment, 
-                which will be called gzip. Conda environments are isolated spaces that allow you to manage 
-                different sets of packages and dependencies for different projects.
-                
-                gzip: This second instance of gzip is the package you want to install into the newly created 
-                environment. This will install the gzip compression utility in the gzip environment.
-                
-                -y: The -y flag, or --yes, automatically answers "yes" to any prompts that Conda would 
-                otherwise present, such as "Proceed ([y]/n)?". 
-        
-        2. rna_expression_pipeline.sh 
-                This will run each step mentioned below for proprocess RNA raw reads, alignment, quantification, and differential analysis
-
-                Use the following in terminal:
-                    sbatch rna_expression_pipeline.sh
-
-                Verify queue:
-                    squeue
-
-
-Option 2:
-Follow the steps below as a tutorial.
 
 _________________________________________________________________________________________________________________________________________________________
 
@@ -69,31 +28,39 @@ Installation Requirements
 
 
 Create conda environments 
-``` 
-# gzip environment
-conda create -n gzip gzip -y
+```
+# 1. Create gzip envirnoment
+        conda create -n gzip -c conda-forge
+# 1A. Install gzip in the gzip environment
+        conda activate gzip
+        conda install -c conda-forge gzip -y
+        conda deactivate
 
-# fastqc environment
-conda create -n fastqc fastqc -y
+# 2. Create fastqc envirnoment
+        conda create -n fastqc fastqc
+# 2A. Install fastqc in the fastqc environment
+        conda activate fastqc
+        conda install -c bioconda fastqc -y
+        conda deactivate
 
-# trimmomatic environment
-conda create -n trimmomatic trimmomatic -y
+# 3. Create trimmomatic enviroment 
+        conda create -n trimmomatic -c bioconda -y
+# 3A. Install trimmomatic in the fastqc environment
+        conda activate trimmomatic
+        conda install -c bioconda trimmomatic -y
+        conda deactivate
 
-# rsem environment (using conda-forge as priority to avoid conflicts)
-conda create -n rsem -c conda-forge -c bioconda rsem star -y
+# 4. Create rsem environment
+        conda create -n rsem -c conda-forge -c bioconda rsem star -y
+# 4A. Install rsem in the rsem environment
+        conda activate rsem
+        conda install -c conda-forge -c bioconda rsem star -y
+        conda deactivate
 ```
 
-Biosample Summary - Homo sapiens K562 genetically modified (deletion) using CRISPR targeting H. sapiens RNASEH2A
-From: 
-https://www.encodeproject.org/experiments/ENCSR002JOW/#:~:text=Isogenic%20replicateLibrary-,Accession,-File%20typeRun
-<br/>
 
-**Sample/Data: grab the paired fastq files from link above**
-        
-        ENCFF489WGO.fastq.gz
-        ENCFF522FSF.fastq.gz
-
-
+# Use Any long read RNA Samples
+## The following are general steps for processing Any lond read RNA Data:
 -----------------------------------------------------------------------------
 Step 1: Unzip gz 
     conda activate gzip
@@ -137,51 +104,78 @@ Step 4: Recheck Quality using fastqc
 Step 5: Run rsem for gene expression from RNA-Seq dataset
 
 Summary:
-    rsem quantifies gene and isoform expression levels from RNA-Seq data 
+rsem quantifies gene and isoform expression levels from RNA-Seq data 
 
-    rsem-prepare-reference: generates a set of reference transcript sequences 
-    rsem-calculate-expression: aligns RNA-seq reads to the reference transcripts and uses the alignments to estimate
-    abundances.
+rsem-prepare-reference: generates a set of reference transcript sequences 
+rsem-calculate-expression: aligns RNA-seq reads to the reference transcripts and uses the alignments to estimate
+abundances.
 
-    rsem output: transcript-level and a gene-level count estimate
+rsem output: transcript-level and a gene-level count estimate
 
+### Create directories for RSEM outputs
+        mkdir -p RSEM_reference
+        mkdir -p RSEM_results
+        
+        source activate ../anaconda3/envs/rsem
 
-### Conda installation trobleshooting
-    (I had dependency confilct issue with conda)
-    Conda environment a to install rsem
-    - Delete rsem env 
-    - Create new rsem conda env 
-    - Use conda-forge as priority channel
-        conda install -c conda-forge -c bioconda rsem
-    - Worked!, 
-    - Check using 
-        rsem-calculate-expression --version
+# Define reference files using your specific paths
+        GENOME_FASTA="/home/jnavarrete/anagha_mouse/rsem_reference/GRCm39.primary_assembly.genome.fa"
+        GTF_FILE="/home/jnavarrete/anagha_mouse/rsem_reference/gencode.vM31.primary_assembly.annotation.gtf"
 
-### Create and enter reference directory
-    mkdir -p rsem_reference
-    cd rsem_reference
+# Step 5.1: Prepare reference
+        echo "Step 5.1: Preparing RSEM reference..."
+        rsem-prepare-reference \
+            --gtf "$GTF_FILE" \
+            --star \
+            -p 10 \
+            "$GENOME_FASTA" \
+            /home/jnavarrete/anagha_mouse/RSEM_reference/mouse_reference
 
-### Download Refernece Genome
-    curl -O https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_48/GRCh38.primary_assembly.genome.fa.gz
-    curl -O https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_48/gencode.v48.primary_assembly.annotation.gtf.gz
+# Check if reference preparation was successful
+        if [ $? -eq 0 ]; then
+            echo "Reference preparation completed successfully!"
+        else
+            echo "ERROR: Reference preparation failed! Please check the error messages above."
+            exit 1
+        fi
+        
+        conda deactivate
+        
+        
+        source activate ../anaconda3/envs/rsem
 
-### Uncompress
-    gunzip *.gz
+# Step 5.2: Calculate expression for each sample
+        echo "Step 5.2: Calculating expression for each sample..."
+        
+        trimmed_files=(/home/jnavarrete/anagha_mouse/Trimmed_reads/*_trimmed.fastq)
+        
+        for trimmed_file in "${trimmed_files[@]}"; do
+            sample_name=$(basename "$trimmed_file" _trimmed.fastq)
+            
+            echo "Processing sample: $sample_name"
+            
+            rsem-calculate-expression \
+                --star \
+                -p 10 \
+                --estimate-rspd \
+                --output-genome-bam \
+                "$trimmed_file" \
+                /home/jnavarrete/anagha_mouse/RSEM_reference/mouse_reference \
+                /home/jnavarrete/anagha_mouse/RSEM_results/"$sample_name"
+        done
+        
+        conda deactivate
 
-### Build RSEM reference (this will take a while)
-```
-rsem-prepare-reference \
-    --gtf gencode.v48.primary_assembly.annotation.gtf \
-    --star \
-    -p 8 \
-    GRCh38.primary_assembly.genome.fa \
-    hg38_v48
-```
-### star wasnt install with rsem
-```
-conda install -c bioconda star
-```
-### Then re-run the same rsem-prepare-reference command
-
+# Generate summary report
+        echo "Generating RSEM summary report..."
+        
+        source activate ../anaconda3/envs/rsem
+        rsem-generate-data-matrix RSEM_results/*.genes.results > RSEM_results/gene_expression_matrix.txt
+        rsem-generate-data-matrix RSEM_results/*.isoforms.results > RSEM_results/isoform_expression_matrix.txt
+        conda deactivate
+        
+        echo "RSEM analysis completed!"
+        echo "Gene-level results: RSEM_results/gene_expression_matrix.txt"
+        echo "Isoform-level results: RSEM_results/isoform_expression_matrix.txt"
 -----------------------------------------------------------------------------
 
