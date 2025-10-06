@@ -1,4 +1,4 @@
-# RNA-seq Data Analysis: Processing Samples (bash/cluster) to Visualising Differential Gene Expression (R)
+# Bulk RNA-seq (short reads) Data Analysis: Processing Samples (bash/cluster) to Visualising Differential Gene Expression (R)
 
 Tool: RNA-seq Analysis
 
