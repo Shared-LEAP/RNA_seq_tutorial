@@ -6,7 +6,7 @@ Author: Josue Navarrete
 
 Date: 09/25/2025
 
-Status: In-progress
+Status: Complete!
 
 Summary: The following are steps to obtain, process, and analyze RNAseq data for differential gene expression analysis. 
 
@@ -19,7 +19,7 @@ Run on cluster (personal computer not sufficient, 6 samples took a full day to r
 
 _________________________________________________________________________________________________________________________________________________________
 
-Installation Requirements
+# Installation Requirements
 1. gzip
 2. fastqc 
 3. trimmomatic 
@@ -27,7 +27,7 @@ Installation Requirements
 5. Deseq2 for differential gene expression
 
 
-Create conda environments 
+# Create conda environments 
 ```
 # 1. Create gzip envirnoment
         conda create -n gzip -c conda-forge
@@ -62,7 +62,7 @@ Create conda environments
 # Use Any long read RNA Samples
 ## The following are general steps for processing Any lond read RNA Data:
 -----------------------------------------------------------------------------
-Step 1: Unzip gz 
+### Step 1: Unzip gz 
     conda activate gzip
     
     gzip -dk <path to your folder>/Raw_reads/ENCFF489WGO.fastq.gz.download/ENCFF489WGO.fastq.gz
@@ -71,14 +71,14 @@ Step 1: Unzip gz
 
     conda deactivate
 -----------------------------------------------------------------------------
-Step 2: Perform Quality Control using fastqc
+### Step 2: Perform Quality Control using fastqc
     conda activate fastqc
 
     fastqc Raw_reads/ENCFF489WGO.fastq Raw_reads/ENCFF522FSF.fastq
 
     conda deactivate 
 -----------------------------------------------------------------------------
-Step 3: Trim Reads using trimmomatic
+### Step 3: Trim Reads using trimmomatic
     conda activate trimmomatic
 
     trimmomatic PE \
@@ -94,14 +94,14 @@ Step 3: Trim Reads using trimmomatic
 
     conda deactivate
 -----------------------------------------------------------------------------
-Step 4: Recheck Quality using fastqc 
+### Step 4: Recheck Quality using fastqc 
     conda activate fastqc
 
     fastqc Trim_out/output_forward_unpaired.fastq Trim_out/output_reverse_unpaired.fastq
 
     conda deactivate 
 -----------------------------------------------------------------------------
-Step 5: Run rsem for gene expression from RNA-Seq dataset
+### Step 5: Run rsem for gene expression from RNA-Seq dataset
 
 Summary:
 rsem quantifies gene and isoform expression levels from RNA-Seq data 
@@ -112,17 +112,17 @@ abundances.
 
 rsem output: transcript-level and a gene-level count estimate
 
-### Create directories for RSEM outputs
+#### Create directories for RSEM outputs
         mkdir -p RSEM_reference
         mkdir -p RSEM_results
         
         source activate ../anaconda3/envs/rsem
 
-# Define reference files using your specific paths
+#### Define reference files using your specific paths
         GENOME_FASTA="/home/jnavarrete/anagha_mouse/rsem_reference/GRCm39.primary_assembly.genome.fa"
         GTF_FILE="/home/jnavarrete/anagha_mouse/rsem_reference/gencode.vM31.primary_assembly.annotation.gtf"
 
-# Step 5.1: Prepare reference
+#### Step 5.1: Prepare reference
         echo "Step 5.1: Preparing RSEM reference..."
         rsem-prepare-reference \
             --gtf "$GTF_FILE" \
@@ -131,7 +131,7 @@ rsem output: transcript-level and a gene-level count estimate
             "$GENOME_FASTA" \
             /home/jnavarrete/anagha_mouse/RSEM_reference/mouse_reference
 
-# Check if reference preparation was successful
+#### Check if reference preparation was successful
         if [ $? -eq 0 ]; then
             echo "Reference preparation completed successfully!"
         else
@@ -144,7 +144,7 @@ rsem output: transcript-level and a gene-level count estimate
         
         source activate ../anaconda3/envs/rsem
 
-# Step 5.2: Calculate expression for each sample
+#### Step 5.2: Calculate expression for each sample
         echo "Step 5.2: Calculating expression for each sample..."
         
         trimmed_files=(/home/jnavarrete/anagha_mouse/Trimmed_reads/*_trimmed.fastq)
@@ -166,7 +166,7 @@ rsem output: transcript-level and a gene-level count estimate
         
         conda deactivate
 
-# Generate summary report
+#### Generate summary report
         echo "Generating RSEM summary report..."
         
         source activate ../anaconda3/envs/rsem
